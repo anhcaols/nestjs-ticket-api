@@ -9,9 +9,11 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Response } from 'express';
+import { MyLogger } from 'src/logger/my.logger';
 
 @Controller('user')
 export class UserController {
+  private logger = new MyLogger();
   constructor(private readonly userService: UserService) { }
 
   @Post('new')
@@ -21,6 +23,7 @@ export class UserController {
 
   @Post('login')
   login(@Body() loginUserDto: LoginUserDto) {
+    this.logger.log('login message', 'login context');
     return this.userService.login(loginUserDto);
   }
 

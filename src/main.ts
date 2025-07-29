@@ -2,8 +2,8 @@ import { NestApplication, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
-import { MyLogger } from './logger/my.logger';
 import { MyLoggerDev } from './logger/my.logger.dev';
+import { MyLogger } from './logger/my.logger';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
@@ -12,7 +12,7 @@ async function bootstrap() {
     // bufferLogs: true,
   });
 
-  // app.useLogger(app.get(MyLoggerDev));
+  // app.useLogger(new MyLoggerDev());
   app.useGlobalPipes(new ValidationPipe());
   
   // cors
