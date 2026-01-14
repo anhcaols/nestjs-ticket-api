@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, BadRequestException, UploadedFiles, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFiles,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,7 +28,7 @@ import { MyLogger } from 'src/logger/my.logger';
 @Controller('user')
 export class UserController {
   private logger = new MyLogger();
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post('new')
   register(@Body() registerUserDto: RegisterUserDto) {
@@ -28,61 +42,73 @@ export class UserController {
   }
 
   @Post('upload/avt')
-  @UseInterceptors(FileInterceptor('file', {
-    dest: 'uploads/avatar',
-    storage: storage,
-    limits: {
-      fileSize: 1024 * 1024 * 3,
-    },
-    fileFilter: (req, file, cb) => {
-      const extName = path.extname(file.originalname);
-      if ([".png", ".jpg", ".gif"].includes(extName)) {
-        return cb(null, true);
-      }
-      return cb(new BadRequestException('Upload file error!'), false);
-    }
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      dest: 'uploads/avatar',
+      storage: storage,
+      limits: {
+        fileSize: 1024 * 1024 * 3,
+      },
+      fileFilter: (req, file, cb) => {
+        const extName = path.extname(file.originalname);
+        if (['.png', '.jpg', '.gif'].includes(extName)) {
+          return cb(null, true);
+        }
+        return cb(new BadRequestException('Upload file error!'), false);
+      },
+    }),
+  )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return file.path;
   }
- 
+
   @Get('merge/file')
   mergeFile(@Query('file') fileName: string, @Res() res: Response) {
     const nameDir = 'uploads/' + fileName;
     // read file
     const files = fs.readdirSync(nameDir);
 
-    let startPos = 0, countFile = 0;
+    let startPos = 0,
+      countFile = 0;
 
-    files.map(file => {
+    files.map((file) => {
       // get path full
       const filePath = nameDir + '/' + file;
       const streamFile = fs.createReadStream(filePath);
-      streamFile.pipe(fs.createWriteStream('uploads/merge/' + fileName, {
-        start: startPos,
-      })).on('finish', () => {
-        countFile++;
-        if(countFile === files.length) {
-          fs.rm(nameDir, {recursive: true}, (err) => {
-            if(err) {
-              console.log('err', err);
-            }
-          });
-        }
-      });
+      streamFile
+        .pipe(
+          fs.createWriteStream('uploads/merge/' + fileName, {
+            start: startPos,
+          }),
+        )
+        .on('finish', () => {
+          countFile++;
+          if (countFile === files.length) {
+            fs.rm(nameDir, { recursive: true }, (err) => {
+              if (err) {
+                console.log('err', err);
+              }
+            });
+          }
+        });
       startPos += fs.statSync(filePath).size;
-    })
+    });
     return res.json({
       link: `http://localhost:3000/uploads/merge/${fileName}`,
-      fileName
+      fileName,
     });
   }
 
   @Post('upload/large-file')
-  @UseInterceptors(FilesInterceptor('files', 20, {
-    dest: 'uploads',
-  }))
-  uploadLargeFile(@UploadedFiles() files: Express.Multer.File[], @Body() body: { name: string}) {
+  @UseInterceptors(
+    FilesInterceptor('files', 20, {
+      dest: 'uploads',
+    }),
+  )
+  uploadLargeFile(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: { name: string },
+  ) {
     console.log('files', files);
     console.log('body', body);
 
@@ -91,7 +117,7 @@ export class UserController {
     const nameDir = 'uploads/chunks' + '-' + fileName;
 
     // mkdir
-    if(!fs.existsSync(nameDir)) {
+    if (!fs.existsSync(nameDir)) {
       fs.mkdirSync(nameDir);
     }
 

@@ -3,16 +3,16 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  private logger = new Logger()
+  private logger = new Logger();
   constructor(private readonly appService: AppService) {}
 
   @Get()
   getHello(): string {
-    this.logger.error('error', AppController.name)
-    this.logger.warn('warn', AppController.name)
-    this.logger.log('log', AppController.name)
-    this.logger.verbose('verbose', AppController.name)
-    this.logger.debug('debug', AppController.name)
+    this.logger.error('error', AppController.name);
+    this.logger.warn('warn', AppController.name);
+    this.logger.log('log', AppController.name);
+    this.logger.verbose('verbose', AppController.name);
+    this.logger.debug('debug', AppController.name);
     return this.appService.getHello();
   }
 }

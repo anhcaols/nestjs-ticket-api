@@ -1,4 +1,4 @@
-import { ConsoleLogger } from "@nestjs/common";
+import { ConsoleLogger } from '@nestjs/common';
 
 export class MyLoggerDev extends ConsoleLogger {
   log(message: string, context?: string) {
@@ -15,7 +15,7 @@ export class MyLoggerDev extends ConsoleLogger {
   }
   verbose(message: string, context?: string) {
     console.log(`**VERBOSE** [${context}] | `, message);
-  } 
+  }
   fatal(message: string, context?: string) {
     console.log(`**FATAL** [${context}] | `, message);
   }

@@ -8,7 +8,6 @@ import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class UserService {
-
   @Inject(DbService)
   dbService: DbService;
 
@@ -16,7 +15,9 @@ export class UserService {
     const users: User[] = await this.dbService.read();
 
     // check if user already exists
-    const userFound = users.find(user => user.accountname === registerUserDto.accountname);
+    const userFound = users.find(
+      (user) => user.accountname === registerUserDto.accountname,
+    );
     if (userFound) {
       throw new BadRequestException('User already exists');
     }
@@ -35,7 +36,9 @@ export class UserService {
 
   async login(loginUserDto: LoginUserDto) {
     const users: User[] = await this.dbService.read();
-    const userFound = users.find(user => user.accountname === loginUserDto.accountname);
+    const userFound = users.find(
+      (user) => user.accountname === loginUserDto.accountname,
+    );
     if (!userFound) {
       throw new BadRequestException('Login failed!');
     }

@@ -1,5 +1,5 @@
-import { LoggerService } from "@nestjs/common";
-import { createLogger, Logger, format, transports } from "winston";
+import { LoggerService } from '@nestjs/common';
+import { createLogger, Logger, format, transports } from 'winston';
 import * as dayjs from 'dayjs';
 import chalk from 'chalk';
 
@@ -8,11 +8,12 @@ export class MyLogger implements LoggerService {
   constructor() {
     this.logger = createLogger({
       level: 'debug',
-      format: format.combine(
+      format: format
+        .combine
         // format.colorize(),
         // format.timestamp(),
         // format.simple()
-      ),
+        (),
       transports: [
         new transports.Console({
           format: format.combine(
@@ -21,19 +22,16 @@ export class MyLogger implements LoggerService {
               const strApp = chalk.green('[Nest]');
               const strContext = chalk.yellow(`[${context}]`);
               return `${strApp} - ${time} ${level}  ${strContext} ${message}`;
-            })
-          )
+            }),
+          ),
         }),
         new transports.File({
           dirname: 'log',
           filename: 'demo.dev.log',
-          format: format.combine(
-            format.timestamp(),
-            format.json()
-          )
-        })
-      ]
-    })
+          format: format.combine(format.timestamp(), format.json()),
+        }),
+      ],
+    });
   }
 
   log(message: string, context: string) {

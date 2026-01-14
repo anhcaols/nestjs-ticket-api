@@ -15,7 +15,7 @@ export class DbModule {
           provide: 'OPTIONS',
           useValue: options,
         },
-        DbService
+        DbService,
       ],
       exports: [DbService],
     };

@@ -9,4 +9,4 @@ import { MyLoggerDev } from './logger/my.logger.dev';
   controllers: [AppController],
   providers: [AppService, MyLoggerDev],
 })
-export class AppModule { }
+export class AppModule {}
