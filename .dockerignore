@@ -1,0 +1,9 @@
+*.md
+!README.md
+nodem_modules/
+*.txt
+.git/
+.gitignore
+.prettierrc
+.vscode/
+.DB_Store
