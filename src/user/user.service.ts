@@ -40,7 +40,7 @@ export class UserService {
       (user) => user.accountname === loginUserDto.accountname,
     );
     if (!userFound) {
-      throw new BadRequestException('Login failed!');
+      throw new BadRequestException('Login failed!!');
     }
 
     if (userFound.password !== loginUserDto.password) {
