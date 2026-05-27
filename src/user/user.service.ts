@@ -87,7 +87,7 @@ export class UserService {
       },
     });
     if (!foundUser) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException('User not found!', 404);
     }
     return {
       user: foundUser,
