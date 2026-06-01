@@ -1,72 +1,97 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { DbService } from 'src/db/db.service';
+import { Repository } from 'typeorm';
+import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { createHash } from 'crypto';
+import { LoginUserVO } from './vo/login-user.vo';
+import { JwtService } from '@nestjs/jwt';
+import { ProfileUserVO } from './vo/profile-user.vo';
+
+function md5(text: string) {
+  const hash = createHash('md5');
+  hash.update(text);
+  return hash.digest('hex');
+}
 
 @Injectable()
 export class UserService {
-  @Inject(DbService)
-  dbService: DbService;
+  @InjectRepository(User)
+  private userRepository: Repository<User>;
 
-  async register(registerUserDto: RegisterUserDto) {
-    const users: User[] = await this.dbService.read();
+  // jwt
+  @Inject(JwtService)
+  private jwtService: JwtService;
 
-    // check if user already exists
-    const userFound = users.find(
-      (user) => user.accountname === registerUserDto.accountname,
-    );
-    if (userFound) {
-      throw new BadRequestException('User already exists');
+  async register(user: RegisterUserDto) {
+    // Check existing user
+    const existingUser = await this.userRepository.findOne({
+      where: {
+        username: user.username,
+      },
+    });
+    if (existingUser) {
+      throw new HttpException('User already exists', 200);
     }
 
-    const user = new User();
-    user.accountname = registerUserDto.accountname;
-    user.password = registerUserDto.password;
-
-    // push
-    users.push(user);
-
-    // save file
-    await this.dbService.write(users);
-    return user;
+    // Create new user
+    const newUser = new User();
+    newUser.email = user.email;
+    newUser.username = user.username;
+    newUser.password = md5(user.password);
+    try {
+      await this.userRepository.save(newUser);
+    } catch (error) {
+      throw new HttpException('Error', 500);
+    }
+    return 'OK';
   }
 
-  async login(loginUserDto: LoginUserDto) {
-    const users: User[] = await this.dbService.read();
-    const userFound = users.find(
-      (user) => user.accountname === loginUserDto.accountname,
-    );
-    if (!userFound) {
-      throw new BadRequestException('Login failed!!');
+  async login(user: LoginUserDto): Promise<LoginUserVO> {
+    // Find user
+    const foundUser = await this.userRepository.findOne({
+      where: {
+        username: user.username,
+      },
+    });
+    if (!foundUser) {
+      throw new HttpException('User not found', 404);
     }
 
-    if (userFound.password !== loginUserDto.password) {
-      throw new BadRequestException('Login failed!');
+    // Check password
+    if (foundUser.password !== md5(user.password)) {
+      throw new HttpException('Error', 401);
     }
 
-    return userFound;
+    // JWT generate token
+    const token = this.jwtService.sign({
+      id: foundUser.id,
+      username: foundUser.username,
+      iat: Math.floor(Date.now() / 1000),
+    });
+
+    return {
+      elements: {
+        user: foundUser,
+        token,
+      },
+      status: '200',
+    };
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
-
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async getProfile(userId: number): Promise<ProfileUserVO> {
+    const foundUser = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!foundUser) {
+      throw new HttpException('User not found!', 404);
+    }
+    return {
+      user: foundUser,
+      status: '200',
+    };
   }
 }
