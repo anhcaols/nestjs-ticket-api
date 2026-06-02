@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Permission } from './permission.entity';
 
 @Entity({
   name: 'jwt_user',
@@ -42,4 +45,10 @@ export class User {
     comment: 'The date and time the user was last updated',
   })
   updatedAt: Date;
+
+  @ManyToMany(() => Permission)
+  @JoinTable({
+    name: 'jwt_user_permissions',
+  })
+  permissions: Permission[];
 }

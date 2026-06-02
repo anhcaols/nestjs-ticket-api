@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
+import { Permission } from './user/entities/permission.entity';
 import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
@@ -12,9 +13,9 @@ import { JwtModule } from '@nestjs/jwt';
       host: '127.0.0.1',
       port: 3306,
       username: 'root',
-      password: '',
+      password: 'caotheanh',
       database: 'jwt',
-      entities: [User],
+      entities: [User, Permission],
       synchronize: true,
       logging: true,
       subscribers: [],
