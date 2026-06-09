@@ -1,4 +1,13 @@
-import { Delete, HttpException, Inject, Injectable, Param, Req, SetMetadata, UseGuards } from '@nestjs/common';
+import {
+  Delete,
+  HttpException,
+  Inject,
+  Injectable,
+  Param,
+  Req,
+  SetMetadata,
+  UseGuards,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -98,17 +107,15 @@ export class UserService {
   async getPermissionsByUsername(username: string) {
     const user = await this.userRepository.findOne({
       where: {
-        username
+        username,
       },
       relations: {
         permissions: true,
       },
-    })
+    });
     if (!user) {
       throw new HttpException('User not found!', 404);
     }
     return user;
   }
-
-  
 }
